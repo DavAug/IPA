@@ -3,3 +3,6 @@ env
 
 # setup log
 *.egg-info
+
+# pycache
+__pycache__
