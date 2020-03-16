@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages, Command
+from setuptools import setup, find_packages
 
 # Load text for description and license
 with open('README.md') as f:
@@ -23,10 +23,11 @@ setup(
     url='https://github.com/DavAug/IPA.git',
 
     # Packages to include
-    packages=find_packages(include=('IPA','IPA.*')),
+    packages=find_packages(include=('IPA', 'IPA.*')),
 
     # List of dependencies
     install_requires=[
+        'flake8'
         'cma>=2',
         'numpy>=1.8',
         'scipy>=0.14',
