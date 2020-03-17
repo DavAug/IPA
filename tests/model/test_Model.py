@@ -216,54 +216,103 @@ class TestMultiOutputModel(unittest.TestCase):
         # assert correct number of parameters is returned.
         assert n_parameters == self.two_comp_model.n_parameters()
 
+    def test_n_outputs(self):
+        """Tests whether the n_outputs method returns the correct number of
+        outputs.
+        """
+        # Test Case I: Two Uncoupled Linear Growth Models (ULG models)
+        # expected
+        n_outputs = 2
 
-#     def test_n_outputs(self):
-#         """Tests whether the n_outputs method returns the correct number of outputs.
-#         """
-#         # Test case I: 1-compartment model
-#         ## expected
-#         n_outputs = 2
+        # assert that the number of outputs coincide
+        assert n_outputs == self.ULG_model.n_outputs()
 
-#         ## assert correct number of outputs.
-#         assert n_outputs == self.two_comp_model.n_outputs()
+    def test_simulate(self):
+        """Tests whether the simulate method works as expected. Tests
+        implicitly also whether the _set_parameters method works properly.
+        """
+        # Test Case I: Two Uncoupled Linear Growth Models (ULG models)
+        # define model
+        output_names = ['central_compartment.drug',
+                        'peripheral_compartment.drug'
+                        ]
+        state_dimension = 2
+        parameters = [0, 0, 1, 2]  # states + parameters
+        parameter_names = ['central_compartment.lambda',
+                           'peripheral_compartment.lambda'
+                           ]
+        times = np.arange(100)
 
+        # expected
+        # initialise model
+        model, protocol, _ = myokit.load(self.file_ULG_model)
 
-#     def test_simulate(self):
-#         """Tests whether the simulate method works as expected. Tests implicitly also whether
-#         the _set_parameters method works properly.
-#         """
-#         output_names = ['central_compartment.drug_concentration',
-#                         'peripheral_compartment.drug_concentration']
-#         state_dimension = 2
-#         parameters = [0, 0, 1, 3, 5, 2, 2] # states + parameters
-#         parameter_names = ['central_compartment.CL',
-#                            'central_compartment.Kcp',
-#                            'central_compartment.V',
-#                            'peripheral_compartment.Kpc',
-#                            'peripheral_compartment.V'
-#                            ]
-#         times = np.arange(100)
+        # set initial conditions and parameter values
+        model.set_state(parameters[:state_dimension])
+        for parameter_id, name in enumerate(parameter_names):
+            model.set_value(name, parameters[state_dimension + parameter_id])
 
-#         ## expected
-#         # initialise model
-#         model, protocol, _ = myokit.load(self.file_name)
+        # solve model
+        simulation = myokit.Simulation(model, protocol)
+        myokit_result = simulation.run(duration=times[-1]+1,
+                                       log=output_names,
+                                       log_times=times)
 
-#         # set initial conditions and parameter values
-#         model.set_state(parameters[:state_dimension])
-#         for parameter_id, name in enumerate(parameter_names):
-#             model.set_value(name, parameters[state_dimension + parameter_id])
+        # get expected result
+        expected_result = []
+        for name in output_names:
+            expected_result.append(myokit_result.get(name))
+        np_expected_result = np.array(expected_result)
 
-#         # solve model
-#         simulation = myokit.Simulation(model, protocol)
-#         myokit_result = simulation.run(duration=times[-1]+1, log=output_names, log_times = times)
+        # simulate model with Model.simulate
+        model_result = self.ULG_model.simulate(parameters, times)
 
-#         # get expected result
-#         expected_result = []
-#         for name in output_names:
-#             expected_result.append(myokit_result.get(name))
-#         np_expected_result = np.array(expected_result)
+        # make output compatible with myokit result
+        model_result = model_result.transpose()
 
-#         ## assert that Model.simulate returns the same result.
-#         model_result = self.two_comp_model.simulate(parameters, times).transpose()
+        # assert that simulation results are as expected
+        assert np.allclose(np_expected_result, model_result)
 
-#         assert np.allclose(np_expected_result, model_result)
+        # Test Case II: Two Compartment Model
+        # define model
+        output_names = ['central_compartment.drug_concentration',
+                        'peripheral_compartment.drug_concentration']
+        state_dimension = 2
+        parameters = [0, 0, 1, 3, 5, 2, 2]  # states + parameters
+        parameter_names = ['central_compartment.CL',
+                           'central_compartment.Kcp',
+                           'central_compartment.V',
+                           'peripheral_compartment.Kpc',
+                           'peripheral_compartment.V'
+                           ]
+        times = np.arange(100)
+
+        # expected
+        # initialise model
+        model, protocol, _ = myokit.load(self.file_two_comp_model)
+
+        # set initial conditions and parameter values
+        model.set_state(parameters[:state_dimension])
+        for parameter_id, name in enumerate(parameter_names):
+            model.set_value(name, parameters[state_dimension + parameter_id])
+
+        # solve model
+        simulation = myokit.Simulation(model, protocol)
+        myokit_result = simulation.run(duration=times[-1]+1,
+                                       log=output_names,
+                                       log_times=times)
+
+        # get expected result
+        expected_result = []
+        for name in output_names:
+            expected_result.append(myokit_result.get(name))
+        np_expected_result = np.array(expected_result)
+
+        # simulate model with Model.simulate
+        model_result = self.two_comp_model.simulate(parameters, times)
+
+        # make output compatible with myokit result
+        model_result = model_result.transpose()
+
+        # assert that simulation results are as expected
+        assert np.allclose(np_expected_result, model_result)
