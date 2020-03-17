@@ -233,7 +233,7 @@ class MultiOutputModel(AbstractModel):
 
             # get number of dose events
             number_of_dose_events = len(dose_events)
-            
+
             # initialise dose container
             dose_event_container = np.empty(shape=(number_of_dose_events, 5))
 
