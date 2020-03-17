@@ -24,27 +24,18 @@ time = 0 [h]
 lambda = 1 [ng/h]
     in [ng/h]
     desc: Linear growth factor of the drug (no pharmacological relevance).
-Kcp = 0 [1/h]
-    in [1/h]
-    desc: Transition rate from the central compartment to the peripheral compartment.
-
-# compartment external parameters
-use peripheral_compartment.Kpc as Kpc
 
 # state variable
-dot(drug) = dose_rate + lambda - drug * Kcp + peripheral_compartment.drug * Kpc
+dot(drug) = dose_rate + lambda
     in [ng]
     desc: Drug in central compartment in ng.
 
 [peripheral_compartment]
-# compartment interal parameters
-Kpc = 0 [1/h]
-    in [1/h]
-    desc: Transition rate from the peripheral compartment to the central compartment.
-
-# compartment external parameters
-use central_compartment.Kcp as Kcp
+# compartment internal parameters
+lambda = 1 [ng/h]
+    in [ng/h]
+    desc: Linear growth factor of the drug (no pharmacological relevance).
 
 # state variable
-dot(drug) = central_compartment.drug * Kcp - drug * Kpc
+dot(drug) = lambda
     in [ng]
