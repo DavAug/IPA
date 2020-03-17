@@ -1,7 +1,7 @@
 import unittest
 
-# import myokit
-# import numpy as np
+import myokit
+import numpy as np
 
 from IPA.model import model as m
 
@@ -78,28 +78,66 @@ class TestSingleOutputModel(unittest.TestCase):
         # assert correct number of outputs.
         assert n_outputs == self.linear_model.n_outputs()
 
+    def test_simulate(self):
+        """Tests whether the simulate method works as expected. Tests
+        implicitly also whether the _set_parameters method works properly.
+        """
+        # Test Case I: Linear Growth Model
+        parameters = [1, 2]
+        times = np.arange(25)
 
-#     def test_simulate(self):
-#         """Tests whether the simulate method works as expected. Tests implicitly also whether
-#         the _set_parameters method works properly.
-#         """
-#         # Test case I: 1-compartment model
-#         parameters = [0, 2, 4] # different from initialsed parameters
-#         times = np.arange(25)
+        # expected
+        # init model in myokit
+        model, protocol, _ = myokit.load(self.file_linear_growth_model)
 
-#         ## expected
-#         model, protocol, _ = myokit.load(self.file_name)
-#         model.set_state([parameters[0]])
-#         model.set_value('central_compartment.CL', parameters[1])
-#         model.set_value('central_compartment.V', parameters[2])
-#         simulation = myokit.Simulation(model, protocol)
-#         myokit_result = simulation.run(duration=times[-1]+1, log=['central_compartment.drug_concentration'], log_times = times)
-#         expected_result = myokit_result.get('central_compartment.drug_concentration')
+        # set inital state of model
+        model.set_state([parameters[0]])
 
-#         ## assert that Model.simulate returns the same result.
-#         model_result = self.one_comp_model.simulate(parameters, times)
+        # set linear growth constant
+        model.set_value('central_compartment.lambda', parameters[1])
 
-#         assert np.array_equal(expected_result, model_result)
+        # instantiate and run simulation
+        simulation = myokit.Simulation(model, protocol)
+        myokit_result = simulation.run(duration=times[-1]+1,
+                                       log=['central_compartment.drug'],
+                                       log_times=times
+                                       )
+        expected_result = myokit_result.get('central_compartment.drug')
+
+        # assert that Model.simulate returns the same result.
+        model_result = self.linear_model.simulate(parameters, times)
+
+        assert np.array_equal(expected_result, model_result)
+
+        # Test case II: One Compartment Model (checks whether access of
+        # correct output works)
+        parameters = [0, 2, 4]
+        times = np.arange(25)
+
+        # expected
+        # init model in myokit
+        model, protocol, _ = myokit.load(self.file_one_comp_model)
+
+        # set inital state of model
+        model.set_state([parameters[0]])
+
+        # set clearance and volume
+        model.set_value('central_compartment.CL', parameters[1])
+        model.set_value('central_compartment.V', parameters[2])
+
+        # instantiate and run simulation
+        simulation = myokit.Simulation(model, protocol)
+        state_name = 'central_compartment.drug_concentration'
+        myokit_result = simulation.run(duration=times[-1]+1,
+                                       log=[state_name],
+                                       log_times=times
+                                       )
+        expected_result = myokit_result.get(state_name)
+
+        # assert that Model.simulate returns the same result.
+        model_result = self.one_comp_model.simulate(parameters, times)
+
+        assert np.array_equal(expected_result, model_result)
 
 
 # class TestMultiOutputModel(unittest.TestCase):
