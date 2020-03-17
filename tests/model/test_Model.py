@@ -10,10 +10,12 @@ class TestSingleOutputModel(unittest.TestCase):
     """Tests the functionality of all methods of the SingleOutputModel class.
     """
     # Test Case I: Linear Growth Model
+    # instantiate model
     file_linear_growth_model = 'IPA/modelRepository/linear_growth_model.mmt'
     linear_model = m.SingleOutputModel(file_linear_growth_model)
 
     # Test Case II: One Copmartment Model
+    # instantiate model
     file_one_comp_model = 'IPA/modelRepository/1_bolus_linear.mmt'
     one_comp_model = m.SingleOutputModel(file_one_comp_model)
 
@@ -83,6 +85,7 @@ class TestSingleOutputModel(unittest.TestCase):
         implicitly also whether the _set_parameters method works properly.
         """
         # Test Case I: Linear Growth Model
+        # define parameters and times
         parameters = [1, 2]
         times = np.arange(25)
 
@@ -111,6 +114,7 @@ class TestSingleOutputModel(unittest.TestCase):
 
         # Test case II: One Compartment Model (checks whether access of
         # correct output works)
+        # define parameters and times
         parameters = [0, 2, 4]
         times = np.arange(25)
 
@@ -140,34 +144,57 @@ class TestSingleOutputModel(unittest.TestCase):
         assert np.array_equal(expected_result, model_result)
 
 
-# class TestMultiOutputModel(unittest.TestCase):
-#     """Tests the functionality of all methods of the MultiOutputModel class.
-#     """
-#     # Test case I: 1-compartment model
-#     file_name = 'PKPD/modelRepository/2_bolus_linear.mmt'
-#     two_comp_model = m.MultiOutputModel(file_name)
+class TestMultiOutputModel(unittest.TestCase):
+    """Tests the functionality of all methods of the MultiOutputModel class.
+    """
+    # Test Case I: Two Uncoupled Linear Growth Models (ULG models)
+    # instantiate model
+    file_ULG_model = 'IPA/modelRepository/uncoupled_linear_growth_models.mmt'
+    ULG_model = m.MultiOutputModel(file_ULG_model)
 
-#     # set dimensionality
-#     output_dimension = 2
-#     two_comp_model.set_output_dimension(output_dimension)
+    # set dimensionality
+    output_dimension = 2
+    ULG_model.set_output_dimension(output_dimension)
 
+    # Test case II: Two Compartment Model
+    file_two_comp_model = 'IPA/modelRepository/2_bolus_linear.mmt'
+    two_comp_model = m.MultiOutputModel(file_two_comp_model)
 
-#     def test_init(self):
-#         """Tests whether the Model class initialises as expected.
-#         """
-#         # Test case I: 1-compartment model
-#         ## expected:
-#         state_names = ['central_compartment.drug', 'peripheral_compartment.drug']
-#         parameter_names = ['central_compartment.CL',
-#                            'central_compartment.Kcp',
-#                            'central_compartment.V',
-#                            'peripheral_compartment.Kpc',
-#                            'peripheral_compartment.V'
-#                            ]
+    # set dimensionality
+    output_dimension = 2
+    two_comp_model.set_output_dimension(output_dimension)
 
-#         ## assert initilised values coincide
-#         assert state_names == self.two_comp_model.state_names
-#         assert parameter_names == self.two_comp_model.parameter_names
+    def test_init(self):
+        """Tests whether the Model class initialises as expected.
+        """
+        # Test Case I: Two Uncoupled Linear Growth Models (ULG models)
+        # expected
+        state_names = ['central_compartment.drug',
+                       'peripheral_compartment.drug'
+                       ]
+        parameter_names = ['central_compartment.lambda',
+                           'peripheral_compartment.lambda',
+                           ]
+
+        # assert initialised values coincide
+        assert state_names == self.ULG_model.state_names
+        assert parameter_names == self.ULG_model.parameter_names
+
+        # Test case II: Two Compartment Model
+        # expected:
+        state_names = ['central_compartment.drug',
+                       'peripheral_compartment.drug'
+                       ]
+        parameter_names = ['central_compartment.CL',
+                           'central_compartment.Kcp',
+                           'central_compartment.V',
+                           'peripheral_compartment.Kpc',
+                           'peripheral_compartment.V'
+                           ]
+
+        # assert initialised values coincide
+        assert state_names == self.two_comp_model.state_names
+        assert parameter_names == self.two_comp_model.parameter_names
 
 
 #     def test_n_parameters(self):
