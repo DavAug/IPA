@@ -1,0 +1,50 @@
+# This model is of no pharmacological relevance and serves simply to test
+# the implementation of the methods.
+
+[[model]]
+name: Two Uncoupled Linear Growth Model
+author: David Augustin
+
+# Initial values
+central_compartment.drug = 0 [ng]
+peripheral_compartment.drug = 0 [ng]
+
+[central_compartment]
+# bound variables (dosing controlled by the protocol, and time)
+dose_rate = 0 [ng/h]
+    in [ng/h]
+    bind pace
+    desc: Dose rate in ng/h. Controlled by protocol.
+time = 0 [h]
+    in [h]
+    bind time
+    desc: independent time variable in h.
+
+# compartment internal parameters
+lambda = 1 [ng/h]
+    in [ng/h]
+    desc: Linear growth factor of the drug (no pharmacological relevance).
+Kcp = 0 [1/h]
+    in [1/h]
+    desc: Transition rate from the central compartment to the peripheral compartment.
+
+# compartment external parameters
+use peripheral_compartment.Kpc as Kpc
+
+# state variable
+dot(drug) = dose_rate + lambda - drug * Kcp + peripheral_compartment.drug * Kpc
+    in [ng]
+    desc: Drug in central compartment in ng.
+
+[peripheral_compartment]
+# compartment interal parameters
+Kpc = 0 [1/h]
+    in [1/h]
+    desc: Transition rate from the peripheral compartment to the central compartment.
+
+# compartment external parameters
+use central_compartment.Kcp as Kcp
+
+# state variable
+dot(drug) = central_compartment.drug * Kcp - drug * Kpc
+    in [ng]
