@@ -12,6 +12,6 @@ install:
   - pip install .
 
 script:
-  - pytest
   - python -m flake8
+  - coverage run -m pytest
   - codecov

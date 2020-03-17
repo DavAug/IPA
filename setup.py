@@ -28,6 +28,7 @@ setup(
     # List of dependencies
     install_requires=[
         'flake8',
+        'coverage',
         'codecov',
         'cma>=2',
         'numpy>=1.8',
