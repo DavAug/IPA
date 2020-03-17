@@ -180,7 +180,7 @@ class TestMultiOutputModel(unittest.TestCase):
         assert state_names == self.ULG_model.state_names
         assert parameter_names == self.ULG_model.parameter_names
 
-        # Test case II: Two Compartment Model
+        # Test Case II: Two Compartment Model
         # expected:
         state_names = ['central_compartment.drug',
                        'peripheral_compartment.drug'
@@ -196,16 +196,25 @@ class TestMultiOutputModel(unittest.TestCase):
         assert state_names == self.two_comp_model.state_names
         assert parameter_names == self.two_comp_model.parameter_names
 
+    def test_n_parameters(self):
+        """Tests whether the n_parameter method returns the correct number
+        of fit parameters.
+        """
+        # Test Case I: Two Uncoupled Linear Growth Models (ULG models) (tests
+        #  whether filter for non-bound variables works)
+        # expected
+        n_parameters = 4
 
-#     def test_n_parameters(self):
-#         """Tests whether the n_parameter method returns the correct number of fit parameters.
-#         """
-#         # Test case I: 1-compartment model
-#         ## expected
-#         n_parameters = 7
+        # assert correct number of parameters is returned.
+        assert n_parameters == self.ULG_model.n_parameters()
 
-#         ## assert correct number of parameters is returned.
-#         assert n_parameters == self.two_comp_model.n_parameters()
+        # Test Case II: Two Compartment Model (tests whether filter for non-
+        # inter variables works)
+        # expected
+        n_parameters = 7
+
+        # assert correct number of parameters is returned.
+        assert n_parameters == self.two_comp_model.n_parameters()
 
 
 #     def test_n_outputs(self):
