@@ -13,10 +13,14 @@ class TestSingleOutputModel(unittest.TestCase):
     file_linear_growth_model = 'IPA/modelRepository/linear_growth_model.mmt'
     linear_model = m.SingleOutputModel(file_linear_growth_model)
 
+    # Test case I: One Copmartment Model
+    file_one_comp_model = 'IPA/modelRepository/1_bolus_linear.mmt'
+    one_comp_model = m.SingleOutputModel(file_one_comp_model)
+
     def test_init(self):
         """Tests whether the Model class initialises as expected.
         """
-        # Test case I: Linear Growth Model
+        # Test case I: Linear Growth Model (only one possible output)
         # expected:
         state_names = ['central_compartment.drug']
         output_name = 'central_compartment.drug'
@@ -30,9 +34,19 @@ class TestSingleOutputModel(unittest.TestCase):
             assert self.linear_model.parameter_names[param_id] == param
         assert number_fit_params == self.linear_model.number_parameters_to_fit
 
-#     # Test case I: 1-compartment model
-#     file_name = 'IPA/modelRepository/1_bolus_linear.mmt'
-#     one_comp_model = m.SingleOutputModel(file_name)
+        # Test case II: One Compartment Model (multiple possible outputs)
+        # expected:
+        state_names = ['central_compartment.drug']
+        output_name = 'central_compartment.drug_concentration'
+        parameter_names = ['central_compartment.CL', 'central_compartment.V']
+        num_fit_params = 3
+
+        # assert initilised values coincide
+        assert state_names == self.one_comp_model.state_names
+        assert output_name == self.one_comp_model.output_name
+        for param_id, param in enumerate(parameter_names):
+            assert self.one_comp_model.parameter_names[param_id] == param
+        assert num_fit_params == self.one_comp_model.number_parameters_to_fit
 
 
 #     def test_init(self):
