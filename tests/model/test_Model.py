@@ -13,14 +13,14 @@ class TestSingleOutputModel(unittest.TestCase):
     file_linear_growth_model = 'IPA/modelRepository/linear_growth_model.mmt'
     linear_model = m.SingleOutputModel(file_linear_growth_model)
 
-    # Test case I: One Copmartment Model
+    # Test Case II: One Copmartment Model
     file_one_comp_model = 'IPA/modelRepository/1_bolus_linear.mmt'
     one_comp_model = m.SingleOutputModel(file_one_comp_model)
 
     def test_init(self):
         """Tests whether the Model class initialises as expected.
         """
-        # Test case I: Linear Growth Model (only one possible output)
+        # Test Case I: Linear Growth Model (only one possible output)
         # expected:
         state_names = ['central_compartment.drug']
         output_name = 'central_compartment.drug'
@@ -34,7 +34,7 @@ class TestSingleOutputModel(unittest.TestCase):
             assert self.linear_model.parameter_names[param_id] == param
         assert number_fit_params == self.linear_model.number_parameters_to_fit
 
-        # Test case II: One Compartment Model (multiple possible outputs)
+        # Test Case II: One Compartment Model (multiple possible outputs)
         # expected:
         state_names = ['central_compartment.drug']
         output_name = 'central_compartment.drug_concentration'
@@ -48,34 +48,23 @@ class TestSingleOutputModel(unittest.TestCase):
             assert self.one_comp_model.parameter_names[param_id] == param
         assert num_fit_params == self.one_comp_model.number_parameters_to_fit
 
+    def test_n_parameters(self):
+        """Tests whether the n_parameter method returns the correct number
+        of fit parameters.
+        """
+        # Test Case I: Linear Growth Model
+        # expected
+        n_parameters = 2
 
-#     def test_init(self):
-#         """Tests whether the Model class initialises as expected.
-#         """
-#         # Test case I: 1-compartment model
-#         ## expected:
-#         state_names = ['central_compartment.drug']
-#         output_name = 'central_compartment.drug_concentration'
-#         parameter_names = ['central_compartment.CL', 'central_compartment.V']
-#         number_parameters_to_fit = 3
+        # assert correct number of parameters is returned.
+        assert n_parameters == self.linear_model.n_parameters()
 
-#         ## assert initilised values coincide
-#         assert state_names == self.one_comp_model.state_names
-#         assert output_name == self.one_comp_model.output_name
-#         for parameter_id, parameter in enumerate(self.one_comp_model.parameter_names):
-#             assert parameter_names[parameter_id] == parameter
-#         assert number_parameters_to_fit == self.one_comp_model.number_parameters_to_fit
+        # Test Case II: One Compartment Model
+        # expected
+        n_parameters = 3
 
-
-#     def test_n_parameters(self):
-#         """Tests whether the n_parameter method returns the correct number of fit parameters.
-#         """
-#         # Test case I: 1-compartment model
-#         ## expected
-#         n_parameters = 3
-
-#         ## assert correct number of parameters is returned.
-#         assert n_parameters == self.one_comp_model.n_parameters()
+        # assert correct number of parameters is returned.
+        assert n_parameters == self.one_comp_model.n_parameters()
 
 
 #     def test_n_outputs(self):
