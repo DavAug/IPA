@@ -6,3 +6,6 @@ env
 
 # pycache
 __pycache__
+
+# vs code config
+.vscode
