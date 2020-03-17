@@ -3,4 +3,4 @@
 
 # IPA - Information Profile Algorithm 
 
-This repository is the explanatory phase of my model identifiability project
+This repository is the explorational phase of my model identifiability project
