@@ -27,7 +27,7 @@ setup(
 
     # List of dependencies
     install_requires=[
-        'flake8'
+        'flake8',
         'cma>=2',
         'numpy>=1.8',
         'scipy>=0.14',
