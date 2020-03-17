@@ -66,16 +66,17 @@ class TestSingleOutputModel(unittest.TestCase):
         # assert correct number of parameters is returned.
         assert n_parameters == self.one_comp_model.n_parameters()
 
+    def test_n_outputs(self):
+        """Tests whether the n_outputs method returns the correct number of
+        outputs. One test case is sufficient as returned value of n_outputs()
+        is hard coded.
+        """
+        # Test Case I: Linear Growth Model
+        # expected
+        n_outputs = 1
 
-#     def test_n_outputs(self):
-#         """Tests whether the n_outputs method returns the correct number of outputs.
-#         """
-#         # Test case I: 1-compartment model
-#         ## expected
-#         n_outputs = 1
-
-#         ## assert correct number of outputs.
-#         assert n_outputs == self.one_comp_model.n_outputs()
+        # assert correct number of outputs.
+        assert n_outputs == self.linear_model.n_outputs()
 
 
 #     def test_simulate(self):
