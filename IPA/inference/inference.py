@@ -316,4 +316,6 @@ class MultiOutputInverseProblem(object):
             boundaries {List} -- List of two lists. [min values, max values]
         """
         min_values, max_values = boundaries[0], boundaries[1]
-        self.parameter_boundaries = pints.RectangularBoundaries(min_values, max_values)
+        self.parameter_boundaries = pints.RectangularBoundaries(min_values,
+                                                                max_values
+                                                                )
