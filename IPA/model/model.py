@@ -180,7 +180,7 @@ class SingleOutputModel(pints.ForwardModel):
 
 class MultiOutputModel(pints.ForwardModel):
     """Model class inheriting from pints.ForwardModel. To solve the forward
-    problem methods from the myokit package are employed. The sole difference
+    problem, methods from the myokit package are employed. The sole difference
     to the SingleOutputProblem is that the simulate method returns a 2d array
     instead of a 1d array.
     """
