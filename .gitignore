@@ -9,3 +9,6 @@ __pycache__
 
 # vs code config
 .vscode
+
+# DS store
+.DS_Store
