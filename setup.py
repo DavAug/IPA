@@ -28,6 +28,7 @@ setup(
     # List of dependencies
     install_requires=[
         'flake8',
+        'pytest',
         'coverage',
         'codecov',
         'cma>=2',
