@@ -2,11 +2,12 @@
 # the implementation of the methods.
 
 [[model]]
-name: Linear Growth Model
+name: Two Uncoupled Linear Growth Model
 author: David Augustin
 
 # Initial values
 central_compartment.drug = 0 [ng]
+peripheral_compartment.drug = 0 [ng]
 
 [central_compartment]
 # bound variables (dosing controlled by the protocol, and time)
@@ -28,6 +29,16 @@ lambda = 1 [ng/h]
 dot(drug) = dose_rate + lambda
     in [ng]
     desc: Drug in central compartment in ng.
+
+[peripheral_compartment]
+# compartment internal parameters
+lambda = 1 [ng/h]
+    in [ng/h]
+    desc: Linear growth factor of the drug (no pharmacological relevance).
+
+# state variable
+dot(drug) = lambda
+    in [ng]
 
 [[protocol]]
 #level start length period multiplier
