@@ -3,11 +3,10 @@ from typing import List
 
 import myokit
 import numpy as np
+import pints
 
-from IPA.model.abstractModel import AbstractModel
 
-
-class SingleOutputModel(AbstractModel):
+class SingleOutputModel(pints.ForwardModel):
     """Model class inheriting from pints.ForwardModel. To solve the forward
     problem, methods from the myokit package are employed. The sole difference
     to the MultiOutputProblem is that the simulate methodreturns a 1d array
@@ -179,7 +178,7 @@ class SingleOutputModel(AbstractModel):
             self.simulation.set_constant(self.parameter_names[param_id], value)
 
 
-class MultiOutputModel(AbstractModel):
+class MultiOutputModel(pints.ForwardModel):
     """Model class inheriting from pints.ForwardModel. To solve the forward
     problem methods from the myokit package are employed. The sole difference
     to the SingleOutputProblem is that the simulate method returns a 2d array
