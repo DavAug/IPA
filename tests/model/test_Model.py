@@ -240,6 +240,23 @@ class TestMultiOutputModel(unittest.TestCase):
         # assert that the number of outputs coincide
         assert n_outputs == self.ULG_model.n_outputs()
 
+    def test_set_output(self):
+        """Tests whether the set_output method sets the output as expected.
+        """
+        # Test Case I: Two Uncoupled Linear Growth Models (ULG models)
+        # expected
+        output_names = ['central_compartment.drug',
+                        'peripheral_compartment.drug'
+                        ]
+        output_dimension = 2
+
+        # set output
+        self.ULG_model.set_output(output_names)
+
+        # assert output is set correctly.
+        assert output_dimension == self.ULG_model.output_dimension
+        assert output_names == self.ULG_model.output_names
+
     def test_simulate(self):
         """Tests whether the simulate method works as expected. Tests
         implicitly also whether the _set_parameters method works properly.
