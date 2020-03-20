@@ -162,7 +162,7 @@ class TestMultiOutputModel(unittest.TestCase):
     """
     # Test Case I: Two Uncoupled Linear Growth Models (ULG models)
     # instantiate model
-    file_ULG_model = 'IPA/modelRepository/uncoupled_linear_growth_models.mmt'
+    file_ULG_model = 'IPA/modelRepository/ULGM_plus_protocol.mmt'
     ULG_model = m.MultiOutputModel(file_ULG_model)
 
     # set dimensionality
