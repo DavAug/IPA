@@ -67,20 +67,18 @@ class SingleOutputInverseProblem(object):
 
     def optimise(self,
                  initial_parameter: np.ndarray,
-                 number_of_iterations: int = 1
+                 number_of_iterations: int = 10
                  ) -> None:
         """Find point in parameter space that optimises the error function,
         i.e. find the set of parameters that minimises the distance of the
         model to the data with respect to the error function. Optimisation
-        is run number_of_iterations times and result with minimal score is
-        returned. TODO: Changes this to majority vote in some meaningful way.
+        is run number_of_iterations times and median result is returned.
 
         Arguments:
             initial_parameter {np.ndarray} -- Starting point in parameter
-            space of the optimisation algorithm. TODO: Change this, such that
-            only boundaries can be provided and no initial points.
+            space of the optimisation algorithm.
             number_of_iterations {int} -- Number of times optimisation is run.
-            Default: 5 (arbitrary). TODO: Change this to correct number.
+            Default: 10 (arbitrary).
 
         Return:
             None
@@ -99,18 +97,14 @@ class SingleOutputInverseProblem(object):
 
         # run optimisation 'number_of_iterations' times
         estimate_container = []
-        score_container = []
         for _ in range(number_of_iterations):
-            estimates, score = optimisation.run()
+            estimates, _ = optimisation.run()
             estimate_container.append(estimates)
-            score_container.append(score)
 
-        # return parameters with minimal score TODO: Change this accordingly
-        min_score_id = np.argmin(score_container)
-        self.estimated_parameters, self.objective_score = [
-            estimate_container[min_score_id],
-            score_container[min_score_id]
-            ]
+        # return parameters with minimal score
+        self.estimated_parameters = np.median(a=estimate_container,
+                                              axis=0
+                                              )
 
     def set_error_function(self, error_function: pints.ErrorMeasure) -> None:
         """Sets the objective function which is minimised to find the optimal
@@ -227,10 +221,10 @@ class MultiOutputInverseProblem(object):
         self.estimated_parameters = None
         self.objective_score = None
 
-    def find_optimal_parameter(self,
-                               initial_parameter: np.ndarray,
-                               number_of_iterations: int = 1
-                               ) -> None:
+    def optimise(self,
+                 initial_parameter: np.ndarray,
+                 number_of_iterations: int = 10
+                 ) -> None:
         """Find point in parameter space that optimises the objective function,
         i.e. find the set of parameters that minimises the distance of the
         model to the data with respect to the objective function.
@@ -256,18 +250,14 @@ class MultiOutputInverseProblem(object):
 
         # run optimisation 'number_of_iterations' times
         estimate_container = []
-        score_container = []
         for _ in range(number_of_iterations):
-            estimates, score = optimisation.run()
+            estimates, _ = optimisation.run()
             estimate_container.append(estimates)
-            score_container.append(score)
 
-        # return parameters with minimal score
-        min_score_id = np.argmin(score_container)
-        self.estimated_parameters, self.objective_score = [
-            estimate_container[min_score_id],
-            score_container[min_score_id]
-            ]
+        # return median parameters
+        self.estimated_parameters = np.median(a=estimate_container,
+                                              axis=0
+                                              )
 
     def set_error_function(self, error_function: pints.ErrorMeasure) -> None:
         """Sets the objective function which is minimised to find the optimal

@@ -44,8 +44,8 @@ class TestSingleOutputProblem(unittest.TestCase):
         times
         )
 
-    def test_find_optimal_parameter(self):
-        """Test whether the find_optimal_parameter method works as expected.
+    def test_optimise(self):
+        """Test whether the optimise method works as expected.
         """
         # Test Case I: Linear Growth Model
         # instantiate inverse problem
@@ -60,13 +60,37 @@ class TestSingleOutputProblem(unittest.TestCase):
 
         # solve inverse problem
         problem.optimise(initial_parameter=initial_parameters,
-                         number_of_iterations=1)
-        estimated_paramters = problem.estimated_parameters
+                         number_of_iterations=2)
+        estimated_parameters = problem.estimated_parameters
 
         # assert aggreement of estimates with true paramters
         for param_id, true_value in enumerate(self.linear_model_true_params):
-            estimated_value = estimated_paramters[param_id]
+            estimated_value = estimated_parameters[param_id]
             assert true_value == pytest.approx(estimated_value, rel=0.05)
+
+        # Test Case II: One Compartment Model
+        # instantiate inverse problem
+        problem = inf.SingleOutputInverseProblem(
+            models=[self.one_comp_model],
+            times=[self.times],
+            values=[self.one_comp_model_data]
+            )
+
+        # start somewhere in parameter space (close to the solution for ease)
+        initial_parameters = np.array([0.1, 1.1, 4.1])
+
+        # solve inverse problem
+        problem.optimise(initial_parameter=initial_parameters,
+                         number_of_iterations=2)
+        estimated_parameters = problem.estimated_parameters
+
+        # assert aggreement of estimates with true paramters
+        for param_id, true_value in enumerate(self.one_comp_model_true_params):
+            estimated_value = estimated_parameters[param_id]
+            if true_value == 0 and abs(estimated_value) < 1E-3:
+                continue
+            else:
+                assert true_value == pytest.approx(estimated_value, rel=0.05)
 
     def test_set_error_function(self):
         """Test whether the set_error_function method works as expected.
