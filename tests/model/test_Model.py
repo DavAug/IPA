@@ -80,6 +80,19 @@ class TestSingleOutputModel(unittest.TestCase):
         # assert correct number of outputs.
         assert n_outputs == self.linear_model.n_outputs()
 
+    def test_set_output(self):
+        """Tests whether the set_output method sets the output as expected.
+        """
+        # Test Case I: Linear Growth Model
+        # expected
+        output_name = 'central_compartment.drug'
+
+        # set output
+        self.linear_model.set_output(output_name)
+
+        # assert output is set correctly.
+        assert output_name == self.linear_model.output_name
+
     def test_simulate(self):
         """Tests whether the simulate method works as expected. Tests
         implicitly also whether the _set_parameters method works properly.
