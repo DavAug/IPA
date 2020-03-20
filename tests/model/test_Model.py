@@ -11,7 +11,7 @@ class TestSingleOutputModel(unittest.TestCase):
     """
     # Test Case I: Linear Growth Model
     # instantiate model
-    file_linear_growth_model = 'IPA/modelRepository/linear_growth_model.mmt'
+    file_linear_growth_model = 'IPA/modelRepository/LGM_plus_protocol.mmt'
     linear_model = m.SingleOutputModel(file_linear_growth_model)
 
     # Test Case II: One Copmartment Model
@@ -22,7 +22,7 @@ class TestSingleOutputModel(unittest.TestCase):
     def test_init(self):
         """Tests whether the Model class initialises as expected.
         """
-        # Test Case I: Linear Growth Model (only one possible output)
+        # Test Case I: Linear Growth Model + protocol
         # expected:
         state_names = ['central_compartment.drug']
         output_name = 'central_compartment.drug'
