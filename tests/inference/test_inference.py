@@ -160,6 +160,27 @@ class TestSingleOutputProblem(unittest.TestCase):
 
         assert flag
 
+    def test_set_parameter_boundaries(self):
+        """Tests whether setting boundaries for inference works as expected.
+        """
+        # Test Case I: Linear Growth Model
+        problem = inf.SingleOutputInverseProblem(
+            models=[self.linear_model],
+            times=[self.times],
+            values=[self.linear_model_data]
+            )
+
+        # define boundaries
+        min_values = [0, 0]
+        max_values = [3, 3]
+        boundaries = pints.RectangularBoundaries(min_values, max_values)
+
+        # set boundaries
+        problem.set_parameter_boundaries(boundaries=[min_values, max_values])
+
+        # assert that boundaries are set properly
+        assert isinstance(problem.parameter_boundaries, type(boundaries))
+
 
 # class TestMultiOutputProblem(unittest.TestCase):
 #     """Testing the methods of MultiOutputInverseProblem class.
