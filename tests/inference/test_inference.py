@@ -95,13 +95,13 @@ class TestSingleOutputProblem(unittest.TestCase):
     def test_set_error_function(self):
         """Test whether the set_error_function method works as expected.
         """
-        # Test Case I: Linear Growth Model
         problem = inf.SingleOutputInverseProblem(
             models=[self.linear_model],
             times=[self.times],
             values=[self.linear_model_data]
             )
 
+        # Test Case I: Setting valid error functions
         # iterate through valid error measures
         valid_err_func = [pints.MeanSquaredError,
                           pints.RootMeanSquaredError,
@@ -116,6 +116,15 @@ class TestSingleOutputProblem(unittest.TestCase):
                                   problem.problem_container[0]
                                   ))
                               )
+        # Test Case II: Setting invalid error function
+        flag = False
+
+        try:
+            problem.set_error_function(error_function='not valid err func')
+        except ValueError:
+            flag = True
+
+        assert flag
 
     def test_set_optimiser(self):
         """Test whether the set_optimiser method works as expected. The
