@@ -131,13 +131,13 @@ class TestSingleOutputProblem(unittest.TestCase):
         estimated values are not of interest but rather whether the
         optimisers are properly embedded.
         """
-        # Test Case I: Linear Growth Model
         problem = inf.SingleOutputInverseProblem(
             models=[self.linear_model],
             times=[self.times],
             values=[self.linear_model_data]
             )
 
+        # Test Case I: Setting valid optimisers
         # iterate through valid optimisers
         valid_optimisers = [pints.CMAES,
                             pints.NelderMead,
@@ -149,6 +149,16 @@ class TestSingleOutputProblem(unittest.TestCase):
             problem.set_optimiser(optimiser=opt)
 
             assert opt == problem.optimiser
+
+        # Test Case II: Setting invalid optimisers
+        flag = False
+
+        try:
+            problem.set_optimiser(optimiser='not valid opt')
+        except ValueError:
+            flag = True
+
+        assert flag
 
 
 # class TestMultiOutputProblem(unittest.TestCase):
