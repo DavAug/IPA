@@ -163,13 +163,23 @@ class TestSingleOutputProblem(unittest.TestCase):
     def test_set_parameter_boundaries(self):
         """Tests whether setting boundaries for inference works as expected.
         """
-        # Test Case I: Linear Growth Model
         problem = inf.SingleOutputInverseProblem(
             models=[self.linear_model],
             times=[self.times],
             values=[self.linear_model_data]
             )
 
+        # Test Case I: no boundaries provided
+        # define boundaries
+        boundaries = None
+
+        # set boundaries
+        problem.set_parameter_boundaries(boundaries=boundaries)
+
+        # assert that boundaries are set properly
+        assert problem.parameter_boundaries is None
+
+        # Test Case II: boundaries are provided
         # define boundaries
         min_values = [0, 0]
         max_values = [3, 3]
