@@ -141,6 +141,31 @@ class SingleOutputModel(pints.ForwardModel):
         # return parameter names
         return parameter_names
 
+    def get_state_names(self) -> np.ndarray:
+        """Returns state names.
+
+        Returns:
+            {np.ndarray} -- Returns array with state names.
+        """
+        return self.mdof_names[:self.state_dim]
+
+    def get_param_names(self) -> np.ndarray:
+        """Returns parameter names.
+
+        Returns:
+            {np.ndarray} -- Returns array with parameter names.
+        """
+        return self.mdof_names[self.state_dim:]
+
+    def get_fixed_mdof(self) -> List[np.ndarray]:
+        # get fixed model dof names
+        names = self.mdof_names[~self.fit_mask]
+
+        # get values of fixed mdof
+        values = self.mdof_values[~self.fit_mask]
+
+        return [names, values]
+
     def n_parameters(self) -> int:
         """Returns the number of parameters of the model, i.e. initial
         conditions and model parameters.
@@ -168,6 +193,13 @@ class SingleOutputModel(pints.ForwardModel):
         self.output_name = output_name
 
     def fix_model_dof(self, names: List, values: List) -> None:
+        """Fixes given model degrees of freedom, such that will no longer be
+        inferred, but held constant.
+
+        Arguments:
+            names {List} -- List of model dof names.
+            values {List} -- List of model dof values.
+        """
         # if names or values is None, enable fitting for all mdof
         if names is None or values is None:
             self.number_fit_params = len(self.mdof_names)

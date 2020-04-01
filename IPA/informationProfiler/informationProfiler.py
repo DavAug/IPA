@@ -315,6 +315,3 @@ class informationProfiler(object):
 
         # show figure
         plt.show()
-
-
-

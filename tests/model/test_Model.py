@@ -24,31 +24,42 @@ class TestSingleOutputModel(unittest.TestCase):
         """
         # Test Case I: Linear Growth Model + protocol
         # expected:
-        state_names = ['central_compartment.drug']
+        state_names = np.array(['central_compartment.drug'])
         output_name = 'central_compartment.drug'
-        parameter_names = ['central_compartment.lambda']
+        parameter_names = np.array(['central_compartment.lambda'])
         number_fit_params = 2
 
+        # get models state and parameter names
+        model_state_names = self.linear_model.get_state_names()
+        model_param_names = self.linear_model.get_param_names()
+
         # assert initilised values coincide
-        assert state_names == self.linear_model.state_names
+        assert state_names == model_state_names
         assert output_name == self.linear_model.output_name
         for param_id, param in enumerate(parameter_names):
-            assert self.linear_model.parameter_names[param_id] == param
-        assert number_fit_params == self.linear_model.number_parameters_to_fit
+            assert model_param_names[param_id] == param
+        assert number_fit_params == self.linear_model.number_fit_params
 
         # Test Case II: One Compartment Model (multiple possible outputs)
         # expected:
-        state_names = ['central_compartment.drug']
+        state_names = np.array(['central_compartment.drug'])
         output_name = 'central_compartment.drug_concentration'
-        parameter_names = ['central_compartment.CL', 'central_compartment.V']
+        parameter_names = np.array(['central_compartment.CL',
+                                    'central_compartment.V'
+                                    ]
+                                   )
         num_fit_params = 3
 
+        # get models state and parameter names
+        model_state_names = self.one_comp_model.get_state_names()
+        model_param_names = self.one_comp_model.get_param_names()
+
         # assert initilised values coincide
-        assert state_names == self.one_comp_model.state_names
+        assert state_names == model_state_names
         assert output_name == self.one_comp_model.output_name
         for param_id, param in enumerate(parameter_names):
-            assert self.one_comp_model.parameter_names[param_id] == param
-        assert num_fit_params == self.one_comp_model.number_parameters_to_fit
+            assert model_param_names[param_id] == param
+        assert num_fit_params == self.one_comp_model.number_fit_params
 
     def test_n_parameters(self):
         """Tests whether the n_parameter method returns the correct number
