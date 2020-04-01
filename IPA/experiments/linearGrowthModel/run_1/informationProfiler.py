@@ -52,6 +52,6 @@ profiler.generate_data(start=start,
 # profiler.plot_information_profile()
 
 # plot from files
-profiler.plot_from_files(path='IPA/experiments/linearGrowthModel',
+profiler.plot_from_files(path='IPA/experiments/linearGrowthModel/run_1',
                          parameter_names=['init value', 'growth_factor']
                          )
