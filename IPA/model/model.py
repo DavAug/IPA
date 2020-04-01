@@ -20,23 +20,25 @@ class SingleOutputModel(pints.ForwardModel):
             protocol.
         """
         # load model and protocol
-        model, protocol, _ = myokit.load(mmtfile)
+        self.model, protocol, _ = myokit.load(mmtfile)
 
         # get dose events from protocol
         self.mmt_dose_events = self._get_mmt_dose_events(protocol)
 
         # get state, parameter and output names
-        self.state_names = [state.qname() for state in model.states()]
-        self.state_dimension = model.count_states()
-        self.output_name = self._get_default_output_name(model)
-        self.parameter_names = self._get_parameter_names(model)
-        self.number_parameters_to_fit = model.count_variables(inter=False,
-                                                              bound=False
-                                                              )
+        self.state_dim = self.model.count_states()
+        self.mdof_names = self._get_model_dof_names()
+        self.output_name = self._get_default_output_name()
+
+        # create mask for which mdof can be fitted (default: all)
+        self.number_fit_params = len(self.mdof_names)
+        self.fit_mask = np.ones(self.number_fit_params, dtype=bool)
+
+        # initialise container for model dof values
+        self.mdof_values = np.empty(self.number_fit_params)
 
         # instantiate the simulation
-        self.simulation = myokit.Simulation(model, protocol)
-        self.model = model
+        self.simulation = myokit.Simulation(self.model, protocol)
 
     def _get_mmt_dose_events(self, protocol: myokit.Protocol) -> np.ndarray:
         """Get a list of dose events from the protocol provided in the model mmt file.
@@ -75,7 +77,26 @@ class SingleOutputModel(pints.ForwardModel):
 
             return dose_event_container
 
-    def _get_default_output_name(self, model: myokit.Model):
+    def _get_model_dof_names(self) -> np.ndarray:
+        """Returns a numpy array with the names of model degrees of freedom (dof).
+        States first and parameters last.
+
+        Returns:
+            {np.ndarray} -- Array with model degrees of freedom.
+        """
+        # get state names
+        state_names = [state.qname() for state in self.model.states()]
+
+        # get parameter names
+        parameter_names = self._get_parameter_names()
+
+        # create model dof container [states, params]
+        mdof_names = np.array(state_names + parameter_names)
+
+        # return mdof container
+        return mdof_names
+
+    def _get_default_output_name(self):
         """Returns 'central_compartment.drug_concentration' as output_name by
         default. If variable does not exist in model, first state variable name
         is returned.
@@ -87,15 +108,15 @@ class SingleOutputModel(pints.ForwardModel):
             str -- Output name of model.
         """
         default_output_name = 'central_compartment.drug_concentration'
-        if model.has_variable(default_output_name):
+        if self.model.has_variable(default_output_name):
             return default_output_name
         else:
             # if default output name does not exist, output first state
             # variable
-            first_state_name = self.state_names[0]
+            first_state_name = self.mdof_names[0]
             return first_state_name
 
-    def _get_parameter_names(self, model: myokit.Model):
+    def _get_parameter_names(self):
         """Gets parameter names of the ODE model, i.e. initial conditions are excluded.
 
         Arguments:
@@ -104,8 +125,11 @@ class SingleOutputModel(pints.ForwardModel):
         Returns:
             List -- List of parameter names.
         """
+        # initialise container for parameter names
         parameter_names = []
-        for component in model.components(sort=True):
+
+        # collect parameter names
+        for component in self.model.components(sort=True):
             parameter_names += [var.qname() for var in
                                 component.variables(state=False,
                                                     inter=False,
@@ -114,6 +138,7 @@ class SingleOutputModel(pints.ForwardModel):
                                                     )
                                 ]
 
+        # return parameter names
         return parameter_names
 
     def n_parameters(self) -> int:
@@ -123,7 +148,7 @@ class SingleOutputModel(pints.ForwardModel):
         Returns:
             int -- Number of parameters.
         """
-        return self.number_parameters_to_fit
+        return self.number_fit_params
 
     def n_outputs(self) -> None:
         """Returns the dimension of the state variable.
@@ -141,6 +166,32 @@ class SingleOutputModel(pints.ForwardModel):
             the simulation.
         """
         self.output_name = output_name
+
+    def fix_model_dof(self, names: List, values: List) -> None:
+        # if names or values is None, enable fitting for all mdof
+        if names is None or values is None:
+            self.number_fit_params = len(self.mdof_names)
+            self.fit_mask = np.ones(self.number_fit_params, dtype=bool)
+
+        else:
+            # loop through parameter names and update value and mask
+            for name_id, name in enumerate(names):
+                # find location in mdof container
+                mask = self.mdof_names == name
+
+                # update mask
+                self.fit_mask[mask] = False
+
+                # update value
+                self.mdof_values[mask] = values[name_id]
+
+                # if name does not exist, return warning
+                if not np.any(mask):
+                    print('WARNING: the parameter %s does not seem to exist'
+                          + ' in the model' % name)
+
+            # update the new number of fit parameters
+            self.number_fit_params = int(np.sum(self.fit_mask))
 
     def simulate(self, parameters: np.ndarray, times: np.ndarray) -> array:
         """Solves the forward problem and returns the state values evaluated
@@ -173,9 +224,15 @@ class SingleOutputModel(pints.ForwardModel):
             parameters {np.ndarray} -- Parameters of the model. By convention
                                        [initial condition, model parameters].
         """
-        self.simulation.set_state(parameters[:self.state_dimension])
-        for param_id, value in enumerate(parameters[self.state_dimension:]):
-            self.simulation.set_constant(self.parameter_names[param_id], value)
+        # update model dof
+        self.mdof_values[self.fit_mask] = parameters
+
+        # get param names
+        param_names = self.mdof_names[self.state_dim:]
+
+        self.simulation.set_state(self.mdof_values[:self.state_dim])
+        for param_id, value in enumerate(self.mdof_values[self.state_dim:]):
+            self.simulation.set_constant(param_names[param_id], value)
 
 
 class MultiOutputModel(pints.ForwardModel):
@@ -199,7 +256,7 @@ class MultiOutputModel(pints.ForwardModel):
 
         # get state, parameter and output names
         self.state_names = [state.qname() for state in model.states()]
-        self.state_dimension = model.count_states()
+        self.state_dim = model.count_states()
         self.output_names = []
         self.output_dimension = None
         self.parameter_names = self._get_parameter_names(model)
@@ -320,8 +377,8 @@ class MultiOutputModel(pints.ForwardModel):
             parameters {np.ndarray} -- Parameters of the model. By convention
                                        [initial condition, model parameters].
         """
-        self.simulation.set_state(parameters[:self.state_dimension])
-        for param_id, value in enumerate(parameters[self.state_dimension:]):
+        self.simulation.set_state(parameters[:self.state_dim])
+        for param_id, value in enumerate(parameters[self.state_dim:]):
             self.simulation.set_constant(self.parameter_names[param_id], value)
 
     def set_output_dimension(self, data_dimension: int):
@@ -363,7 +420,7 @@ class MultiOutputModel(pints.ForwardModel):
         # check dimensional compatibility
         if len(default_output_names) >= self.output_dimension:
             self.output_names = default_output_names[:self.output_dimension]
-        elif self.state_dimension >= self.output_dimension:
+        elif self.state_dim >= self.output_dimension:
             self.output_names = self.state_names[:self.output_dimension]
 
     def set_output(self, output_names: List):
