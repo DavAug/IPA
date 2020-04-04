@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import myokit
 import numpy as np
+import pints
 import pytest
 import seaborn as sns
 
@@ -16,13 +17,22 @@ class informationProfiler(object):
         self.data = None
         self.times = None
 
-    def generate_data(self, start=0.0, end=100.0, steps=100):
+    def generate_data(self,
+                      start=0.0,
+                      end=100.0,
+                      steps=100,
+                      optimiser=pints.PSO
+                      ):
         # generate data (without noise)
         self.times = np.linspace(start, end, steps)
         self.data = np.array(self._model.simulate(self.parameters,
                                                   self.times
                                                   )
                              )
+        print(self.times)
+        print(self.data)
+        print(self._model.mdof_values)
+        print(self._model.output_name)
 
         # instantiate inverse problem
         problem = inf.SingleOutputInverseProblem(
@@ -30,6 +40,9 @@ class informationProfiler(object):
             times=[self.times],
             values=[self.data]
             )
+
+        # set optimiser
+        problem.set_optimiser(optimiser=optimiser)
 
         # solve inverse problem
         problem.optimise(initial_parameter=self.parameters,

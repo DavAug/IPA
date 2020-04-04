@@ -23,8 +23,11 @@ time = 0 [h]
 lambda = 1 [1/h]
     in [1/h]
     desc: Linear growth factor of the drug (no pharmacological relevance).
+capacity = 1 [ng]
+    in [ng]
+    desc: Maximumal drug in compartment.
 
 # state variable
-dot(drug) = dose_rate + lambda * drug * (1 - drug)
+dot(drug) = dose_rate + lambda * drug * (1 - drug / capacity)
     in [ng]
     desc: Drug in central compartment non-dimensionalised.
