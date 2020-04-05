@@ -104,6 +104,56 @@ class TestSingleOutputModel(unittest.TestCase):
         # assert output is set correctly.
         assert output_name == self.linear_model.output_name
 
+    def test_fix_model_dof(self):
+        """Tests whether model degrees of freedom can be fixed for optimisation/
+        inference as expected.
+        """
+        # Model across test cases: Linear Growth Model
+
+        # Test Case I: Fix both dof [init drug, growth factor]
+        # expected
+        names = np.array(['central_compartment.drug',
+                          'central_compartment.lambda'
+                          ]
+                         )
+        values = np.array([0.0, 1.0])
+        fit_mask = np.zeros(2, dtype=bool)
+
+        # fix model dof
+        self.linear_model.fix_model_dof(names=names,
+                                        values=values
+                                        )
+
+        # assert that values and mask have been set properly
+        assert np.all(values == self.linear_model.mdof_values)
+        assert np.all(fit_mask == self.linear_model.fit_mask)
+
+        # Test Case II: provide non-existing name
+        # expected (unaltered values, fit mask)
+        values = np.array([0.0, 1.0])
+        fit_mask = np.zeros(2, dtype=bool)
+
+        # fix non-existing dof
+        self.linear_model.fix_model_dof(names=np.array(['bla']),
+                                        values=np.array([42.0])
+                                        )
+
+        # assert that values and fit mask has not been altered
+        assert np.all(values == self.linear_model.mdof_values)
+        assert np.all(fit_mask == self.linear_model.fit_mask)
+
+        # Test Case III: fix no dof
+        # expected
+        fit_mask = np.ones(2, dtype=bool)
+
+        # fix no dof
+        self.linear_model.fix_model_dof(names=None,
+                                        values=None
+                                        )
+        # assert that fit mask is all True
+        assert np.all(fit_mask == self.linear_model.fit_mask)
+
+
     def test_simulate(self):
         """Tests whether the simulate method works as expected. Tests
         implicitly also whether the _set_parameters method works properly.

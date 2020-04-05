@@ -219,8 +219,8 @@ class SingleOutputModel(pints.ForwardModel):
 
                 # if name does not exist, return warning
                 if not np.any(mask):
-                    print('WARNING: the parameter %s does not seem to exist'
-                          + ' in the model' % name)
+                    print('WARNING: the parameter %s does not seem to' % name
+                          + ' exist in the model')
 
             # update the new number of fit parameters
             self.number_fit_params = int(np.sum(self.fit_mask))
