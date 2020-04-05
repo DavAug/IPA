@@ -153,7 +153,6 @@ class TestSingleOutputModel(unittest.TestCase):
         # assert that fit mask is all True
         assert np.all(fit_mask == self.linear_model.fit_mask)
 
-
     def test_simulate(self):
         """Tests whether the simulate method works as expected. Tests
         implicitly also whether the _set_parameters method works properly.
