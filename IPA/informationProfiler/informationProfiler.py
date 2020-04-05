@@ -29,10 +29,6 @@ class informationProfiler(object):
                                                   self.times
                                                   )
                              )
-        print(self.times)
-        print(self.data)
-        print(self._model.mdof_values)
-        print(self._model.output_name)
 
         # instantiate inverse problem
         problem = inf.SingleOutputInverseProblem(
