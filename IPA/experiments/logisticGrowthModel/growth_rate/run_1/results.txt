@@ -1,0 +1,5 @@
+There is an alleviated IP at the transition as expected.
+
+However, there is also a hightened IP at the far end of the
+time series. This may be due to the pairwise sampling, but has
+to be further investigated.

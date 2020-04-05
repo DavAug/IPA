@@ -60,7 +60,11 @@ class informationProfiler(object):
                     (estimated_value)
                 )
 
-    def test_subset_size(self, subset_size=10, maximal_optimisations=10):
+    def test_subset_size(self,
+                         subset_size=10,
+                         maximal_optimisations=10,
+                         optimiser=pints.PSO
+                         ):
         for opt in range(maximal_optimisations):
             # subssample mask
             number_data_points = len(self.times)
@@ -78,6 +82,9 @@ class informationProfiler(object):
                 times=[time_subset],
                 values=[data_subset]
                 )
+
+            # set optimiser
+            problem.set_optimiser(optimiser=optimiser)
 
             # set parameter boundaries
             boundaries_array = np.array(self.boundaries)
@@ -141,7 +148,8 @@ class informationProfiler(object):
                 subset_size=10,
                 iterations=100,
                 opt_per_iter=10,
-                no_successful=7
+                no_successful=7,
+                optimiser=pints.PSO
                 ):
         # get number of parameters
         number_of_parameters = len(self.parameters)
@@ -182,6 +190,9 @@ class informationProfiler(object):
                 times=[time_subset],
                 values=[data_subset]
                 )
+
+            # set optimiser
+            problem.set_optimiser(optimiser=optimiser)
 
             # set parameter boundaries
             boundaries_array = np.array(self.boundaries)
@@ -313,10 +324,11 @@ class informationProfiler(object):
 
             # plot IP
             sns.distplot(data,
-                         hist=False,
-                         kde=True,
+                         hist=True,
+                         kde=False,
                          label='Parameter %s' % param,
-                         ax=axes[param_id+1]
+                         ax=axes[param_id+1],
+                         bins=50
                          )
 
         # add x label

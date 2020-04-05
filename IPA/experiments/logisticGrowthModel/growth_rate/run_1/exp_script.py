@@ -13,7 +13,7 @@ logistic_model = m.SingleOutputModel(file_logistic_model)
 
 # fix the initial condition and the capacity
 names = ['central_compartment.drug', 'central_compartment.capacity']
-values = [0.0, 1.0]
+values = [0.0001, 1.0]
 logistic_model.fix_model_dof(names=names, values=values)
 
 # set true growth rate
@@ -30,7 +30,7 @@ profiler = ip.informationProfiler(model=logistic_model,
 print('')
 print('generate data:')
 start = 0.0
-end = 100.0
+end = 5.0
 steps = 100
 profiler.generate_data(start=start,
                        end=end,
@@ -40,29 +40,29 @@ profiler.generate_data(start=start,
 # # find sample size
 # print('')
 # print('test sample size:')
-# profiler.test_subset_size(subset_size=4)
+# profiler.test_subset_size(subset_size=2)
 
 # # find information profile
 # print('')
 # print('find information profile')
-# profiler.find_IP(subset_size=4,
-#                  iterations=200,
+# profiler.find_IP(subset_size=2,
+#                  iterations=500,
 #                  opt_per_iter=1,
 #                  no_successful=1
 #                  )
 
 # # save information profile
-# profiler.save_profile(path='IPA/experiments/logisticGrowthModel',
-#                       parameter_names=['init value', 'growth_factor']
+# profiler.save_profile(path='IPA/experiments/logisticGrowthModel/growth_rate',
+#                       parameter_names=['growth_factor']
 #                       )
 
-# generate plot of model
-profiler.plot_data()
+# # generate plot of model
+# profiler.plot_data()
 
 # # generate plots of information profile
 # profiler.plot_information_profile()
 
-# # plot model and IP from files
-# profiler.plot_from_files(path='IPA/experiments/logisticGrowthModel',
-#                          parameter_names=['init value', 'growth_factor']
-#                          )
+# plot model and IP from files
+profiler.plot_from_files(path='IPA/experiments/logisticGrowthModel/growth_rate',
+                         parameter_names=['growth_factor']
+                         )
