@@ -1,17 +1,26 @@
+import numpy as np
+
 from IPA.model import model as m
 from IPA.informationProfiler import informationProfiler as ip
 
 # This script is to have a first glance at the Information Profile Algorithm
-# Test Case I: Logistic Growth Model
+# Test Case I: Linear Growth Model
 # instantiate model
-file_logistic_model = 'IPA/modelRepository/logistic_growth_model.mmt'
-logistic_model = m.SingleOutputModel(file_logistic_model)
-logistic_model_true_params = [0.001, 25]  # [init drug, lambda]
-parameter_boundaries = [[0, 1], [0, 50]]
+file_linear_model = 'IPA/modelRepository/linear_growth_model.mmt'
+linear_model = m.SingleOutputModel(file_linear_model)
+
+# fix growth rate
+name = np.array(['central_compartment.lambda'])
+value = np.array([2.0])
+linear_model.fix_model_dof(names=name, values=value)
+
+# set true values of dof to optimise
+true_init_cond = [1]
+parameter_boundaries = [[0, 100]]
 
 # instantiate IP
-profiler = ip.informationProfiler(model=logistic_model,
-                                  parameters=logistic_model_true_params,
+profiler = ip.informationProfiler(model=linear_model,
+                                  parameters=true_init_cond,
                                   boundaries=parameter_boundaries
                                   )
 
@@ -19,7 +28,7 @@ profiler = ip.informationProfiler(model=logistic_model,
 print('')
 print('generate data:')
 start = 0.0
-end = 1.0
+end = 100.0
 steps = 100
 profiler.generate_data(start=start,
                        end=end,
@@ -29,29 +38,29 @@ profiler.generate_data(start=start,
 # # find sample size
 # print('')
 # print('test sample size:')
-# profiler.test_subset_size(subset_size=4)
+# profiler.test_subset_size(subset_size=10)
 
 # # find information profile
 # print('')
 # print('find information profile')
-# profiler.find_IP(subset_size=4,
+# profiler.find_IP(subset_size=10,
 #                  iterations=200,
 #                  opt_per_iter=1,
 #                  no_successful=1
 #                  )
 
 # # save information profile
-# profiler.save_profile(path='IPA/experiments/logisticGrowthModel',
+# profiler.save_profile(path='IPA/experiments/linearGrowthModel',
 #                       parameter_names=['init value', 'growth_factor']
 #                       )
 
-# # generate plot of model
-# profiler.plot_data()
+# generate plot of model
+profiler.plot_data()
 
 # # generate plots of information profile
 # profiler.plot_information_profile()
 
-# plot model and IP from files
-profiler.plot_from_files(path='IPA/experiments/logisticGrowthModel',
-                         parameter_names=['init value', 'growth_factor']
-                         )
+# # plot from files
+# profiler.plot_from_files(path='IPA/experiments/linearGrowthModel/all_params',
+#                          parameter_names=['init value', 'growth_factor']
+#                          )
